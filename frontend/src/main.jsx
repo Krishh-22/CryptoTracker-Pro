@@ -1,0 +1,31 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+
+import { WatchlistProvider } from "./context/WatchlistContext";
+import { PortfolioProvider } from "./context/PortfolioContext";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <WatchlistProvider>
+      <PortfolioProvider>
+        <App />
+      </PortfolioProvider>
+    </WatchlistProvider>
+
+    <ToastContainer
+      position="top-right"
+      autoClose={2500}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnHover
+      draggable
+      theme="dark"
+    />
+  </React.StrictMode>
+);
