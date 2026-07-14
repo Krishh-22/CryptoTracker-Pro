@@ -106,7 +106,7 @@ CryptoTracker-Pro/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/CryptoTracker-Pro.git
+git clone https://github.com/Krishh-22/CryptoTracker-Pro.git
 ```
 
 ---
