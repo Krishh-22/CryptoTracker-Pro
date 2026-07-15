@@ -12,15 +12,27 @@ async def get_market_data():
         "sparkline": False,
     }
 
-    async with httpx.AsyncClient(timeout=20) as client:
-        response = await client.get(
-            COINGECKO_URL,
-            params=params,
-        )
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            response = await client.get(
+                COINGECKO_URL,
+                params=params,
+                headers={
+                    "User-Agent": "CryptoTracker-Pro"
+                },
+            )
 
-        response.raise_for_status()
+            print("Status Code:", response.status_code)
 
-        data = response.json()
+            response.raise_for_status()
+
+            data = response.json()
+
+    except Exception as e:
+        print("CoinGecko Error:", str(e))
+        return {
+            "error": str(e)
+        }
 
     coins = []
 
