@@ -1,7 +1,8 @@
+import os
 import httpx
 
-COINGECKO_URL = "https://api.coingecko.com/api/v3/coins/markets"
-
+#COINGECKO_URL = "https://api.coingecko.com/api/v3/coins/markets"
+API_KEY = os.getenv("COINGECKO_API_KEY")
 
 async def get_market_data():
     params = {
@@ -18,6 +19,7 @@ async def get_market_data():
                 COINGECKO_URL,
                 params=params,
                 headers={
+                    "x-cg-demo-api-key": API_KEY,
                     "User-Agent": "CryptoTracker-Pro"
                 },
             )
@@ -78,6 +80,10 @@ async def get_coin_history(coin_id: str):
         response = await client.get(
             url,
             params=params,
+            headers={
+                "x-cg-demo-api-key": API_KEY,
+                "User-Agent": "CryptoTracker-Pro"
+            }
         )
 
         response.raise_for_status()
