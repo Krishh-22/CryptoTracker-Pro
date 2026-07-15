@@ -1,64 +1,38 @@
-import os
 import httpx
 
-#COINGECKO_URL = "https://api.coingecko.com/api/v3/coins/markets"
-API_KEY = os.getenv("COINGECKO_API_KEY")
+COINPAPRIKA_URL = "https://api.coinpaprika.com/v1/tickers"
+
 
 async def get_market_data():
-    params = {
-        "vs_currency": "usd",
-        "order": "market_cap_desc",
-        "per_page": 25,
-        "page": 1,
-        "sparkline": False,
-    }
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.get(COINPAPRIKA_URL)
+        response.raise_for_status()
 
-    try:
-        async with httpx.AsyncClient(timeout=20) as client:
-            response = await client.get(
-                COINGECKO_URL,
-                params=params,
-                headers={
-                    "x-cg-demo-api-key": API_KEY,
-                    "User-Agent": "CryptoTracker-Pro"
-                },
-            )
-
-            print("Status Code:", response.status_code)
-
-            response.raise_for_status()
-
-            data = response.json()
-
-    except Exception as e:
-        print("CoinGecko Error:", str(e))
-        return {
-            "error": str(e)
-        }
+        data = response.json()[:25]
 
     coins = []
 
     for coin in data:
+        quotes = coin.get("quotes", {}).get("USD", {})
+
+        price = quotes.get("price", 0)
+        change = quotes.get("percent_change_24h", 0)
+
         coins.append(
             {
                 "id": coin["id"],
                 "name": coin["name"],
-                "symbol": coin["symbol"].upper(),
-                "image": coin["image"],
-                "price": f"${coin['current_price']:,.2f}",
-                "change": round(
-                    coin.get("price_change_percentage_24h") or 0,
-                    2,
-                ),
-                "positive": (
-                    coin.get("price_change_percentage_24h") or 0
-                ) >= 0,
-                "market_cap": coin.get("market_cap"),
-                "high_24h": coin.get("high_24h"),
-                "low_24h": coin.get("low_24h"),
-                "volume": coin.get("total_volume"),
+                "symbol": coin["symbol"],
+                "image": f"https://static.coinpaprika.com/coin/{coin['id']}/logo.png",
+                "price": f"${price:,.2f}",
+                "change": round(change, 2),
+                "positive": change >= 0,
+                "market_cap": quotes.get("market_cap"),
+                "high_24h": None,
+                "low_24h": None,
+                "volume": quotes.get("volume_24h"),
                 "circulating_supply": coin.get("circulating_supply"),
-                "rank": coin.get("market_cap_rank"),
+                "rank": coin.get("rank"),
             }
         )
 
@@ -66,42 +40,14 @@ async def get_market_data():
 
 
 async def get_coin_history(coin_id: str):
-    url = (
-        f"https://api.coingecko.com/api/v3/coins/"
-        f"{coin_id}/market_chart"
-    )
-
-    params = {
-        "vs_currency": "usd",
-        "days": 7,
-    }
-
-    async with httpx.AsyncClient(timeout=20) as client:
-        response = await client.get(
-            url,
-            params=params,
-            headers={
-                "x-cg-demo-api-key": API_KEY,
-                "User-Agent": "CryptoTracker-Pro"
-            }
-        )
-
-        response.raise_for_status()
-
-        data = response.json()
-
-    prices = data["prices"]
-
-    history = []
-
-    step = max(1, len(prices) // 7)
-
-    for i, price in enumerate(prices[::step][:7]):
-        history.append(
-            {
-                "day": f"Day {i + 1}",
-                "price": round(price[1], 2),
-            }
-        )
-
-    return history
+    # Temporary placeholder until we wire a historical endpoint.
+    # This keeps your chart component from crashing.
+    return [
+        {"day": "Day 1", "price": 0},
+        {"day": "Day 2", "price": 0},
+        {"day": "Day 3", "price": 0},
+        {"day": "Day 4", "price": 0},
+        {"day": "Day 5", "price": 0},
+        {"day": "Day 6", "price": 0},
+        {"day": "Day 7", "price": 0},
+    ]
